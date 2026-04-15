@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-brand: 34 197 94;
+    --color-danger: 239 68 68;
+    --color-warning: 234 179 8;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Thin dark scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #111118; }
+  ::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a3a4a; }
+
+  body {
+    @apply bg-surface-900 text-white;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-surface-800 border border-surface-600 rounded-xl p-5;
+  }
+
+  .btn-primary {
+    @apply bg-brand-600 hover:bg-brand-500 text-white font-medium px-4 py-2 rounded-lg
+           transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply bg-surface-700 hover:bg-surface-600 text-white/80 hover:text-white
+           font-medium px-4 py-2 rounded-lg transition-colors duration-150;
+  }
+
+  .badge-buy {
+    @apply bg-brand-600/20 text-brand-400 text-xs font-semibold px-2 py-0.5 rounded-full;
+  }
+
+  .badge-sell {
+    @apply bg-red-600/20 text-red-400 text-xs font-semibold px-2 py-0.5 rounded-full;
+  }
+
+  .badge-active {
+    @apply bg-blue-600/20 text-blue-400 text-xs font-semibold px-2 py-0.5 rounded-full;
+  }
+
+  .badge-tp {
+    @apply bg-brand-600/20 text-brand-400 text-xs font-semibold px-2 py-0.5 rounded-full;
+  }
+
+  .badge-sl {
+    @apply bg-red-600/20 text-red-400 text-xs font-semibold px-2 py-0.5 rounded-full;
+  }
+
+  .stat-card {
+    @apply card flex flex-col gap-1;
+  }
+
+  .input {
+    @apply bg-surface-700 border border-surface-500 rounded-lg px-3 py-2 text-sm
+           text-white placeholder-white/30 focus:outline-none focus:border-brand-500
+           transition-colors duration-150 w-full;
+  }
+}
