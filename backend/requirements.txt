@@ -1,13 +1,11 @@
+# All packages pinned to versions with pre-built wheels for Python 3.11 Linux x86_64.
+# No source compilation required — fast installs on Render free tier.
+
 fastapi==0.111.0
 uvicorn[standard]==0.29.0
 python-jose[cryptography]==3.3.0
 httpx==0.27.0
 supabase==2.4.2
-pandas==2.2.2
-numpy==1.26.4
-scikit-learn==1.4.2
-xgboost==2.0.3
-ta==0.11.0
 python-dotenv==1.0.1
 pydantic==2.7.1
 pydantic-settings==2.2.1
@@ -15,3 +13,10 @@ apscheduler==3.10.4
 requests==2.31.0
 websockets==12.0
 python-multipart==0.0.9
+
+# Scientific stack — exact versions with CPython 3.11 manylinux wheels on PyPI
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.4.2
+xgboost==2.0.3
+ta==0.11.0
