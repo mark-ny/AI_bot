@@ -2,16 +2,21 @@
 Background scheduler using APScheduler.
 - Every hour:  generate forex signals for all pairs
 - Every day at 02:00 UTC: retrain the ML model
+
+All jobs are wrapped in broad exception handlers so a failure
+in one job never crashes the uvicorn process.
 """
 import asyncio
+import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
+logger = logging.getLogger(__name__)
 _scheduler: BackgroundScheduler | None = None
 
 
 def _run_async(coro):
-    """Helper to run async functions in the sync scheduler thread."""
+    """Run an async coroutine in a fresh event loop (scheduler runs in a thread)."""
     loop = asyncio.new_event_loop()
     try:
         return loop.run_until_complete(coro)
@@ -20,30 +25,31 @@ def _run_async(coro):
 
 
 def _job_generate_signals():
-    from app.services.signal_service import generate_all_signals
-    print("[scheduler] Running signal generation job")
     try:
+        from app.services.signal_service import generate_all_signals
+        logger.info("[scheduler] Running signal generation job")
         signals = _run_async(generate_all_signals())
-        print(f"[scheduler] Generated {len(signals)} signals")
+        logger.info(f"[scheduler] Generated {len(signals)} signals")
     except Exception as exc:
-        print(f"[scheduler] Signal generation failed: {exc}")
+        # Log but never re-raise — a job failure must not crash uvicorn
+        logger.error(f"[scheduler] Signal generation failed (non-fatal): {exc}")
 
 
 def _job_retrain_model():
-    from app.ml.trainer import train_and_save
-    print("[scheduler] Running daily model retrain")
     try:
+        from app.ml.trainer import train_and_save
+        logger.info("[scheduler] Running daily model retrain")
         _run_async(train_and_save())
-        print("[scheduler] Model retrain completed")
+        logger.info("[scheduler] Model retrain completed")
     except Exception as exc:
-        print(f"[scheduler] Model retrain failed: {exc}")
+        logger.error(f"[scheduler] Model retrain failed (non-fatal): {exc}")
 
 
 def start_scheduler():
     global _scheduler
     _scheduler = BackgroundScheduler(timezone="UTC")
 
-    # Hourly signal generation (at minute 0)
+    # Hourly signal generation (at :00 of every hour)
     _scheduler.add_job(
         _job_generate_signals,
         CronTrigger(minute=0),
@@ -60,14 +66,23 @@ def start_scheduler():
     )
 
     _scheduler.start()
-    print("[scheduler] Started — signals hourly, retrain daily at 02:00 UTC")
+    logger.info("[scheduler] Started — signals hourly, retrain daily at 02:00 UTC")
 
-    # Run signal generation once on startup
-    _job_generate_signals()
+    # Defer the startup signal run by 10 s so the server finishes binding its port first
+    # This prevents a slow API call from blocking the health-check window
+    import threading
+    def _deferred():
+        import time
+        time.sleep(10)
+        _job_generate_signals()
+
+    t = threading.Thread(target=_deferred, daemon=True)
+    t.start()
 
 
 def stop_scheduler():
     global _scheduler
     if _scheduler and _scheduler.running:
         _scheduler.shutdown(wait=False)
-        print("[scheduler] Stopped")
+        logger.info("[scheduler] Stopped")
+    
