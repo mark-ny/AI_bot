@@ -1,6 +1,4 @@
-# All packages pinned to versions with pre-built wheels for Python 3.11 Linux x86_64.
-# No source compilation required — fast installs on Render free tier.
-
+# ── Core API ──────────────────────────────────────────────────
 fastapi==0.111.0
 uvicorn[standard]==0.29.0
 python-jose[cryptography]==3.3.0
@@ -14,7 +12,10 @@ requests==2.31.0
 websockets==12.0
 python-multipart==0.0.9
 
-# Scientific stack — exact versions with CPython 3.11 manylinux wheels on PyPI
+# ── Scientific stack ──────────────────────────────────────────
+# Pinned to versions that have manylinux wheels for Python 3.11.
+# If Render is still using Python 3.14, these will fail fast
+# with a clear error instead of a 10-minute compile attempt.
 numpy==1.26.4
 pandas==2.2.2
 scikit-learn==1.4.2
