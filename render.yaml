@@ -4,16 +4,13 @@ services:
     env: python
     region: oregon
     plan: free
-    rootDir: backend
     buildCommand: pip install -r requirements.txt
-    startCommand: cd /opt/render/project/src/backend && python -u run.py
+    startCommand: python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
       - key: PYTHONUNBUFFERED
         value: "1"
-      - key: PYTHONPATH
-        value: /opt/render/project/src/backend
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_KEY
