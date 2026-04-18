@@ -57,7 +57,7 @@ export default function DashboardPage() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "signals" },
-        (payload) => {
+        (payload: { new: unknown }) => {
           const newSignal = payload.new as Signal;
           setSignals((prev) => [newSignal, ...prev.slice(0, 19)]);
           toast.success(`New signal: ${newSignal.direction} ${newSignal.pair}`, {
