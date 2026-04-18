@@ -1,12 +1,12 @@
 services:
   - type: web
-    name: AI_bot-backend
+    name: forex-signal-backend
     env: python
     region: oregon
     plan: free
     rootDir: backend
     buildCommand: pip install -r requirements.txt
-    startCommand: bash /opt/render/project/src/start.sh
+    startCommand: cd /opt/render/project/src/backend && python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
